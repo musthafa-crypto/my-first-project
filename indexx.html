@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .calculator-button {
+            transition: all 0.2s ease;
+        }
+        .calculator-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .calculator-button:active {
+            transform: translateY(0);
+        }
+        .display-animation {
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .mode-transition {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glow-effect {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 min-h-screen p-4">
+    <div class="container mx-auto max-w-md">
+        <!-- Header -->
+        <div class="text-center mb-6">
+            <h1 class="text-3xl font-bold text-white mb-2">🧮 Advanced Calculator</h1>
+            <p class="text-blue-200">Professional Multi-Mode Calculator</p>
+        </div>
+
+        <!-- Calculator Container -->
+        <div class="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-6 border border-white/20">
+            <!-- Mode Selector -->
+            <div class="flex bg-black/20 rounded-xl p-1 mb-6">
+                <button onclick="switchMode('basic')" id="basic-mode" class="flex-1 py-2 px-4 rounded-lg text-white font-medium transition-all duration-300 bg-blue-600 glow-effect">
+                    Basic
+                </button>
+                <button onclick="switchMode('scientific')" id="scientific-mode" class="flex-1 py-2 px-4 rounded-lg text-white/70 font-medium transition-all duration-300 hover:text-white">
+                    Scientific
+                </button>
+                <button onclick="switchMode('programmer')" id="programmer-mode" class="flex-1 py-2 px-4 rounded-lg text-white/70 font-medium transition-all duration-300 hover:text-white">
+                    Programmer
+                </button>
+            </div>
+
+            <!-- Display -->
+            <div class="bg-black/30 rounded-xl p-4 mb-6 border border-white/10">
+                <div class="text-right">
+                    <div id="history" class="text-blue-200 text-sm h-6 overflow-hidden"></div>
+                    <div id="display" class="text-white text-3xl font-mono mt-2 min-h-[2.5rem] display-animation">0</div>
+                    <div id="mode-info" class="text-blue-300 text-xs mt-2">Basic Mode</div>
+                </div>
+            </div>
+
+            <!-- Basic Mode Buttons -->
+            <div id="basic-buttons" class="mode-transition">
+                <div class="grid grid-cols-4 gap-3">
+                    <!-- Row 1 -->
+                    <button onclick="clearAll()" class="calculator-button bg-red-600 hover:bg-red-700 text-white py-4 rounded-xl font-semibold text-lg">C</button>
+                    <button onclick="clearEntry()" class="calculator-button bg-orange-600 hover:bg-orange-700 text-white py-4 rounded-xl font-semibold text-lg">CE</button>
+                    <button onclick="backspace()" class="calculator-button bg-orange-600 hover:bg-orange-700 text-white py-4 rounded-xl font-semibold text-lg">⌫</button>
+                    <button onclick="appendOperator('/')" class="calculator-button bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-semibold text-lg">÷</button>
+                    
+                    <!-- Row 2 -->
+                    <button onclick="appendNumber('7')" class="calculator-button bg-gray-700 hover:bg-gray-600 text-white py-4 rounded-xl font-semibold text-lg">7</button>
+                    <button onclick="appendNumber('8')" class="calculator-button bg-gray-700 hover:bg-gray-600 text-white py-4 rounded-xl font-semibold text-lg">8</button>
+                    <button onclick="appendNumber('9')" class="calculator-button bg-gray-700 hover:bg-gray-600 text-white py-4 rounded-xl font-semibold text-lg">9</button>
+                    <button onclick="appendOperator('*')" class="calculator-button bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-semibold text-lg">×</button>
+                    
+                    <!-- Row 3 -->
+                    <button onclick="appendNumber('4')" class="calculator-button bg-gray-700 hover:bg-gray-600 text-white py-4 rounded-xl font-semibold text-lg">4</button>
+                    <button onclick="appendNumber('5')" class="calculator-button bg-gray-700 hover:bg-gray-600 text-white py-4 rounded-xl font-semibold text-lg">5</button>
+                    <button onclick="appendNumber('6')" class="calculator-button bg-gray-700 hover:bg-gray-600 text-white py-4 rounded-xl font-semibold text-lg">6</button>
+                    <button onclick="appendOperator('-')" class="calculator-button bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-semibold text-lg">−</button>
+                    
+                    <!-- Row 4 -->
+                    <button onclick="appendNumber('1')" class="calculator-button bg-gray-700 hover:bg-gray-600 text-white py-4 rounded-xl font-semibold text-lg">1</button>
+                    <button onclick="appendNumber('2')" class="calculator-button bg-gray-700 hover:bg-gray-600 text-white py-4 rounded-xl font-semibold text-lg">2</button>
+                    <button onclick="appendNumber('3')" class="calculator-button bg-gray-700 hover:bg-gray-600 text-white py-4 rounded-xl font-semibold text-lg">3</button>
+                    <button onclick="appendOperator('+')" class="calculator-button bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-semibold text-lg">+</button>
+                    
+                    <!-- Row 5 -->
+                    <button onclick="toggleSign()" class="calculator-button bg-gray-600 hover:bg-gray-500 text-white py-4 rounded-xl font-semibold text-lg">±</button>
+                    <button onclick="appendNumber('0')" class="calculator-button bg-gray-700 hover:bg-gray-600 text-white py-4 rounded-xl font-semibold text-lg">0</button>
+                    <button onclick="appendDecimal()" class="calculator-button bg-gray-600 hover:bg-gray-500 text-white py-4 rounded-xl font-semibold text-lg">.</button>
+                    <button onclick="calculate()" class="calculator-button bg-green-600 hover:bg-green-700 text-white py-4 rounded-xl font-semibold text-lg">=</button>
+                </div>
+            </div>
+
+            <!-- Scientific Mode Buttons -->
+            <div id="scientific-buttons" class="mode-transition hidden">
+                <div class="grid grid-cols-5 gap-2">
+                    <!-- Row 1 -->
+                    <button onclick="clearAll()" class="calculator-button bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg font-semibold text-sm">C</button>
+                    <button onclick="clearEntry()" class="calculator-button bg-orange-600 hover:bg-orange-700 text-white py-3 rounded-lg font-semibold text-sm">CE</button>
+                    <button onclick="backspace()" class="calculator-button bg-orange-600 hover:bg-orange-700 text-white py-3 rounded-lg font-semibold text-sm">⌫</button>
+                    <button onclick="scientificFunction('sqrt')" class="calculator-button bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-semibold text-sm">√</button>
+                    <button onclick="scientificFunction('power')" class="calculator-button bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-semibold text-sm">x²</button>
+                    
+                    <!-- Row 2 -->
+                    <button onclick="scientificFunction('sin')" class="calculator-button bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg font-semibold text-sm">sin</button>
+                    <button onclick="scientificFunction('cos')" class="calculator-button bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg font-semibold text-sm">cos</button>
+                    <button onclick="scientificFunction('tan')" class="calculator-button bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg font-semibold text-sm">tan</button>
+                    <button onclick="scientificFunction('log')" class="calculator-button bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg font-semibold text-sm">log</button>
+                    <button onclick="scientificFunction('ln')" class="calculator-button bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg font-semibold text-sm">ln</button>
+                    
+                    <!-- Row 3 -->
+                    <button onclick="appendNumber('7')" class="calculator-button bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-lg font-semibold text-sm">7</button>
+                    <button onclick="appendNumber('8')" class="calculator-button bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-lg font-semibold text-sm">8</button>
+                    <button onclick="appendNumber('9')" class="calculator-button bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-lg font-semibold text-sm">9</button>
+                    <button onclick="appendOperator('/')" class="calculator-button bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold text-sm">÷</button>
+                    <button onclick="scientificFunction('factorial')" class="calculator-button bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-semibold text-sm">n!</button>
+                    
+                    <!-- Row 4 -->
+                    <button onclick="appendNumber('4')" class="calculator-button bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-lg font-semibold text-sm">4</button>
+                    <button onclick="appendNumber('5')" class="calculator-button bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-lg font-semibold text-sm">5</button>
+                    <button onclick="appendNumber('6')" class="calculator-button bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-lg font-semibold text-sm">6</button>
+                    <button onclick="appendOperator('*')" class="calculator-button bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold text-sm">×</button>
+                    <button onclick="appendConstant('pi')" class="calculator-button bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-semibold text-sm">π</button>
+                    
+                    <!-- Row 5 -->
+                    <button onclick="appendNumber('1')" class="calculator-button bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-lg font-semibold text-sm">1</button>
+                    <button onclick="appendNumber('2')" class="calculator-button bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-lg font-semibold text-sm">2</button>
+                    <button onclick="appendNumber('3')" class="calculator-button bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-lg font-semibold text-sm">3</button>
+                    <button onclick="appendOperator('-')" class="calculator-button bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold text-sm">−</button>
+                    <button onclick="appendConstant('e')" class="calculator-button bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-semibold text-sm">e</button>
+                    
+                    <!-- Row 6 -->
+                    <button onclick="toggleSign()" class="calculator-button bg-gray-600 hover:bg-gray-500 text-white py-3 rounded-lg font-semibold text-sm">±</button>
+                    <button onclick="appendNumber('0')" class="calculator-button bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-lg font-semibold text-sm">0</button>
+                    <button onclick="appendDecimal()" class="calculator-button bg-gray-600 hover:bg-gray-500 text-white py-3 rounded-lg font-semibold text-sm">.</button>
+                    <button onclick="appendOperator('+')" class="calculator-button bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold text-sm">+</button>
+                    <button onclick="calculate()" class="calculator-button bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold text-sm">=</button>
+                </div>
+            </div>
+
+            <!-- Programmer Mode Buttons -->
+            <div id="programmer-buttons" class="mode-transition hidden">
+                <!-- Number System Display -->
+                <div class="bg-black/20 rounded-lg p-3 mb-4">
+                    <div class="grid grid-cols-2 gap-2 text-sm">
+                        <div class="text-blue-200">HEX: <span id="hex-display" class="text-white font-mono">0</span></div>
+                        <div class="text-green-200">DEC: <span id="dec-display" class="text-white font-mono">0</span></div>
+                        <div class="text-yellow-200">OCT: <span id="oct-display" class="text-white font-mono">0</span></div>
+                        <div class="text-purple-200">BIN: <span id="bin-display" class="text-white font-mono">0</span></div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-4 gap-2">
+                    <!-- Row 1 -->
+                    <button onclick="clearAll()" class="calculator-button bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg font-semibold text-sm">C</button>
+                    <button onclick="clearEntry()" class="calculator-button bg-orange-600 hover:bg-orange-700 text-white py-3 rounded-lg font-semibold text-sm">CE</button>
+                    <button onclick="backspace()" class="calculator-button bg-orange-600 hover:bg-orange-700 text-white py-3 rounded-lg font-semibold text-sm">⌫</button>
+                    <button onclick="bitwiseOperation('not')" class="calculator-button bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-semibold text-sm">NOT</button>
+                    
+                    <!-- Row 2 -->
+                    <button onclick="appendHex('A')" class="calculator-button bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-lg font-semibold text-sm">A</button>
+                    <button onclick="appendHex('B')" class="calculator-button bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-lg font-semibold text-sm">B</button>
+                    <button onclick="appendHex('C')" class="calculator-button bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-lg font-semibold text-sm">C</button>
+                    <button onclick="bitwiseOperation('and')" class="calculator-button bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-semibold text-sm">AND</button>
+                    
+                    <!-- Row 3 -->
+                    <button onclick="appendHex('D')" class="calculator-button bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-lg font-semibold text-sm">D</button>
+                    <button onclick="appendHex('E')" class="calculator-button bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-lg font-semibold text-sm">E</button>
+                    <button onclick="appendHex('F')" class="calculator-button bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-lg font-semibold text-sm">F</button>
+                    <button onclick="bitwiseOperation('or')" class="calculator-button bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-semibold text-sm">OR</button>
+                    
+                    <!-- Row 4 -->
+                    <button onclick="appendNumber('7')" class="calculator-button bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-lg font-semibold text-sm">7</button>
+                    <button onclick="appendNumber('8')" class="calculator-button bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-lg font-semibold text-sm">8</button>
+                    <button onclick="appendNumber('9')" class="calculator-button bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-lg font-semibold text-sm">9</button>
+                    <button onclick="bitwiseOperation('xor')" class="calculator-button bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-semibold text-sm">XOR</button>
+                    
+                    <!-- Row 5 -->
+                    <button onclick="appendNumber('4')" class="calculator-button bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-lg font-semibold text-sm">4</button>
+                    <button onclick="appendNumber('5')" class="calculator-button bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-lg font-semibold text-sm">5</button>
+                    <button onclick="appendNumber('6')" class="calculator-button bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-lg font-semibold text-sm">6</button>
+                    <button onclick="bitwiseOperation('lshift')" class="calculator-button bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-semibold text-sm"><<</button>
+                    
+                    <!-- Row 6 -->
+                    <button onclick="appendNumber('1')" class="calculator-button bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-lg font-semibold text-sm">1</button>
+                    <button onclick="appendNumber('2')" class="calculator-button bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-lg font-semibold text-sm">2</button>
+                    <button onclick="appendNumber('3')" class="calculator-button bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-lg font-semibold text-sm">3</button>
+                    <button onclick="bitwiseOperation('rshift')" class="calculator-button bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-semibold text-sm">>></button>
+                    
+                    <!-- Row 7 -->
+                    <button onclick="toggleSign()" class="calculator-button bg-gray-600 hover:bg-gray-500 text-white py-3 rounded-lg font-semibold text-sm">±</button>
+                    <button onclick="appendNumber('0')" class="calculator-button bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-lg font-semibold text-sm">0</button>
+                    <button onclick="appendOperator('+')" class="calculator-button bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold text-sm">+</button>
+                    <button onclick="calculate()" class="calculator-button bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold text-sm">=</button>
+                </div>
+            </div>
+
+            <!-- Memory Functions (visible in all modes) -->
+            <div class="flex justify-center gap-2 mt-4">
+                <button onclick="memoryStore()" class="calculator-button bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg font-semibold text-sm">MS</button>
+                <button onclick="memoryRecall()" class="calculator-button bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg font-semibold text-sm">MR</button>
+                <button onclick="memoryAdd()" class="calculator-button bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg font-semibold text-sm">M+</button>
+                <button onclick="memoryClear()" class="calculator-button bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg font-semibold text-sm">MC</button>
+            </div>
+        </div>
+
+        <!-- History Panel -->
+        <div class="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-6 border border-white/20 mt-6">
+            <h3 class="text-white font-semibold mb-4">📜 Calculation History</h3>
+            <div id="calculation-history" class="space-y-2 max-h-40 overflow-y-auto">
+                <p class="text-blue-200 text-sm">No calculations yet</p>
+            </div>
+            <button onclick="clearHistory()" class="w-full mt-4 bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg font-medium transition-colors">
+                Clear History
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Calculator state
+        let currentMode = 'basic';
+        let display = '0';
+        let previousValue = null;
+        let operator = null;
+        let waitingForOperand = false;
+        let memory = 0;
+        let history = [];
+
+        // Initialize calculator
+        updateDisplay();
+
+        // Mode switching
+        function switchMode(mode) {
+            currentMode = mode;
+            
+            // Update mode buttons
+            document.querySelectorAll('[id$="-mode"]').forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'glow-effect');
+                btn.classList.add('text-white/70');
+            });
+            
+            document.getElementById(mode + '-mode').classList.add('bg-blue-600', 'glow-effect');
+            document.getElementById(mode + '-mode').classList.remove('text-white/70');
+            
+            // Show/hide button sets
+            document.getElementById('basic-buttons').classList.add('hidden');
+            document.getElementById('scientific-buttons').classList.add('hidden');
+            document.getElementById('programmer-buttons').classList.add('hidden');
+            
+            document.getElementById(mode + '-buttons').classList.remove('hidden');
+            
+            // Update mode info
+            const modeNames = {
+                'basic': 'Basic Mode',
+                'scientific': 'Scientific Mode',
+                'programmer': 'Programmer Mode'
+            };
+            document.getElementById('mode-info').textContent = modeNames[mode];
+            
+            // Clear display when switching modes
+            clearAll();
+            
+            // Update programmer displays if in programmer mode
+            if (mode === 'programmer') {
+                updateProgrammerDisplays();
+            }
+        }
+
+        // Display functions
+        function updateDisplay() {
+            document.getElementById('display').textContent = display;
+            document.getElementById('display').classList.add('display-animation');
+            setTimeout(() => {
+                document.getElementById('display').classList.remove('display-animation');
+            }, 300);
+            
+            if (currentMode === 'programmer') {
+                updateProgrammerDisplays();
+            }
+        }
+
+        function updateProgrammerDisplays() {
+            const num = parseInt(display) || 0;
+            document.getElementById('hex-display').textContent = num.toString(16).toUpperCase();
+            document.getElementById('dec-display').textContent = num.toString(10);
+            document.getElementById('oct-display').textContent = num.toString(8);
+            document.getElementById('bin-display').textContent = num.toString(2);
+        }
+
+        // Basic input functions
+        function appendNumber(digit) {
+            if (waitingForOperand) {
+                display = digit;
+                waitingForOperand = false;
+            } else {
+                display = display === '0' ? digit : display + digit;
+            }
+            updateDisplay();
+        }
+
+        function appendDecimal() {
+            if (waitingForOperand) {
+                display = '0.';
+                waitingForOperand = false;
+            } else if (display.indexOf('.') === -1) {
+                display += '.';
+            }
+            updateDisplay();
+        }
+
+        function appendOperator(nextOperator) {
+            const inputValue = parseFloat(display);
+
+            if (previousValue === null) {
+                previousValue = inputValue;
+            } else if (operator) {
+                const currentValue = previousValue || 0;
+                const newValue = performCalculation(operator, currentValue, inputValue);
+
+                display = String(newValue);
+                previousValue = newValue;
+                updateDisplay();
+                addToHistory(`${currentValue} ${getOperatorSymbol(operator)} ${inputValue} = ${newValue}`);
+            }
+
+            waitingForOperand = true;
+            operator = nextOperator;
+        }
+
+        function calculate() {
+            const inputValue = parseFloat(display);
+
+            if (previousValue !== null && operator) {
+                const newValue = performCalculation(operator, previousValue, inputValue);
+                display = String(newValue);
+                addToHistory(`${previousValue} ${getOperatorSymbol(operator)} ${inputValue} = ${newValue}`);
+                previousValue = null;
+                operator = null;
+                waitingForOperand = true;
+                updateDisplay();
+            }
+        }
+
+        function performCalculation(operator, firstValue, secondValue) {
+            switch (operator) {
+                case '+':
+                    return firstValue + secondValue;
+                case '-':
+                    return firstValue - secondValue;
+                case '*':
+                    return firstValue * secondValue;
+                case '/':
+                    return secondValue !== 0 ? firstValue / secondValue : 0;
+                default:
+                    return secondValue;
+            }
+        }
+
+        function getOperatorSymbol(op) {
+            const symbols = { '+': '+', '-': '−', '*': '×', '/': '÷' };
+            return symbols[op] || op;
+        }
+
+        // Clear functions
+        function clearAll() {
+            display = '0';
+            previousValue = null;
+            operator = null;
+            waitingForOperand = false;
+            document.getElementById('history').textContent = '';
+            updateDisplay();
+        }
+
+        function clearEntry() {
+            display = '0';
+            updateDisplay();
+        }
+
+        function backspace() {
+            if (display.length > 1) {
+                display = display.slice(0, -1);
+            } else {
+                display = '0';
+            }
+            updateDisplay();
+        }
+
+        function toggleSign() {
+            if (display !== '0') {
+                display = display.charAt(0) === '-' ? display.slice(1) : '-' + display;
+                updateDisplay();
+            }
+        }
+
+        // Scientific functions
+        function scientificFunction(func) {
+            const value = parseFloat(display);
+            let result;
+
+            switch (func) {
+                case 'sqrt':
+                    result = Math.sqrt(value);
+                    addToHistory(`√${value} = ${result}`);
+                    break;
+                case 'power':
+                    result = Math.pow(value, 2);
+                    addToHistory(`${value}² = ${result}`);
+                    break;
+                case 'sin':
+                    result = Math.sin(value * Math.PI / 180);
+                    addToHistory(`sin(${value}°) = ${result}`);
+                    break;
+                case 'cos':
+                    result = Math.cos(value * Math.PI / 180);
+                    addToHistory(`cos(${value}°) = ${result}`);
+                    break;
+                case 'tan':
+                    result = Math.tan(value * Math.PI / 180);
+                    addToHistory(`tan(${value}°) = ${result}`);
+                    break;
+                case 'log':
+                    result = Math.log10(value);
+                    addToHistory(`log(${value}) = ${result}`);
+                    break;
+                case 'ln':
+                    result = Math.log(value);
+                    addToHistory(`ln(${value}) = ${result}`);
+                    break;
+                case 'factorial':
+                    result = factorial(Math.floor(value));
+                    addToHistory(`${Math.floor(value)}! = ${result}`);
+                    break;
+            }
+
+            display = String(result);
+            waitingForOperand = true;
+            updateDisplay();
+        }
+
+        function factorial(n) {
+            if (n < 0) return 0;
+            if (n === 0 || n === 1) return 1;
+            let result = 1;
+            for (let i = 2; i <= n; i++) {
+                result *= i;
+            }
+            return result;
+        }
+
+        function appendConstant(constant) {
+            if (constant === 'pi') {
+                display = String(Math.PI);
+                addToHistory(`π = ${Math.PI}`);
+            } else if (constant === 'e') {
+                display = String(Math.E);
+                addToHistory(`e = ${Math.E}`);
+            }
+            waitingForOperand = true;
+            updateDisplay();
+        }
+
+        // Programmer functions
+        function appendHex(digit) {
+            if (currentMode === 'programmer') {
+                const currentNum = parseInt(display, 16) || 0;
+                const newNum = currentNum * 16 + parseInt(digit, 16);
+                display = String(newNum);
+                updateDisplay();
+            }
+        }
+
+        function bitwiseOperation(operation) {
+            const value = parseInt(display) || 0;
+            let result;
+
+            switch (operation) {
+                case 'not':
+                    result = ~value;
+                    addToHistory(`NOT ${value} = ${result}`);
+                    break;
+                case 'and':
+                    if (previousValue !== null) {
+                        result = previousValue & value;
+                        addToHistory(`${previousValue} AND ${value} = ${result}`);
+                        previousValue = null;
+                    } else {
+                        previousValue = value;
+                        operator = 'and';
+                        waitingForOperand = true;
+                        return;
+                    }
+                    break;
+                case 'or':
+                    if (previousValue !== null) {
+                        result = previousValue | value;
+                        addToHistory(`${previousValue} OR ${value} = ${result}`);
+                        previousValue = null;
+                    } else {
+                        previousValue = value;
+                        operator = 'or';
+                        waitingForOperand = true;
+                        return;
+                    }
+                    break;
+                case 'xor':
+                    if (previousValue !== null) {
+                        result = previousValue ^ value;
+                        addToHistory(`${previousValue} XOR ${value} = ${result}`);
+                        previousValue = null;
+                    } else {
+                        previousValue = value;
+                        operator = 'xor';
+                        waitingForOperand = true;
+                        return;
+                    }
+                    break;
+                case 'lshift':
+                    result = value << 1;
+                    addToHistory(`${value} << 1 = ${result}`);
+                    break;
+                case 'rshift':
+                    result = value >> 1;
+                    addToHistory(`${value} >> 1 = ${result}`);
+                    break;
+            }
+
+            display = String(result);
+            waitingForOperand = true;
+            updateDisplay();
+        }
+
+        // Memory functions
+        function memoryStore() {
+            memory = parseFloat(display);
+            addToHistory(`Memory stored: ${memory}`);
+        }
+
+        function memoryRecall() {
+            display = String(memory);
+            waitingForOperand = true;
+            updateDisplay();
+        }
+
+        function memoryAdd() {
+            memory += parseFloat(display);
+            addToHistory(`Memory added: ${display}, Total: ${memory}`);
+        }
+
+        function memoryClear() {
+            memory = 0;
+            addToHistory('Memory cleared');
+        }
+
+        // History functions
+        function addToHistory(calculation) {
+            history.unshift(calculation);
+            if (history.length > 10) {
+                history = history.slice(0, 10);
+            }
+            updateHistoryDisplay();
+            
+            // Show in mini history
+            document.getElementById('history').textContent = calculation;
+        }
+
+        function updateHistoryDisplay() {
+            const historyElement = document.getElementById('calculation-history');
+            if (history.length === 0) {
+                historyElement.innerHTML = '<p class="text-blue-200 text-sm">No calculations yet</p>';
+            } else {
+                historyElement.innerHTML = history.map(calc => 
+                    `<div class="text-white text-sm bg-white/10 rounded p-2">${calc}</div>`
+                ).join('');
+            }
+        }
+
+        function clearHistory() {
+            history = [];
+            updateHistoryDisplay();
+            document.getElementById('history').textContent = '';
+        }
+
+        // Keyboard support
+        document.addEventListener('keydown', function(event) {
+            const key = event.key;
+            
+            if (key >= '0' && key <= '9') {
+                appendNumber(key);
+            } else if (key === '.') {
+                appendDecimal();
+            } else if (key === '+' || key === '-' || key === '*' || key === '/') {
+                appendOperator(key);
+            } else if (key === 'Enter' || key === '=') {
+                calculate();
+            } else if (key === 'Escape') {
+                clearAll();
+            } else if (key === 'Backspace') {
+                backspace();
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96a45e1e12d7f56a',t:'MTc1NDM3NjcwNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
